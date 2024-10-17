@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -25,61 +26,63 @@ public class Vcontroller {
     public ResponseEntity<?> addVehicle(@RequestBody VehicleResponse vehicleResponse){
         //System.out.println("Grettings from: " + greetingsRequest.getPersonName() + " with text " + greetingsRequest.getGreeting());
         System.out.println(vehicleResponse.toString());
+        vehicleResponseList.add(vehicleResponse);
         return ResponseEntity.ok().build();
     }
 
+//    @DeleteMapping("/vehicle/{id}")
+//    public ResponseEntity<?> deleteVehicle (@PathVariable Integer id){
+//        System.out.println("The id to delete is : " + id);
+//        return ResponseEntity.ok().build();
+//    }
+
     @DeleteMapping("/vehicle/{id}")
-    public ResponseEntity<?> deleteVehicle (@PathVariable Integer id){
+    public ResponseEntity<?>  deleteVehicle(@PathVariable Integer id){
+        vehicleResponseList.removeIf(v -> Objects.equals(v.getId(), id));
         System.out.println("The id to delete is : " + id);
         return ResponseEntity.ok().build();
     }
 
     @PutMapping ("/vehicle/{id}")
-    public ResponseEntity<?> alterVehicle(@PathVariable Integer id , @RequestBody VehicleRequest vehicleRequest){
+    public ResponseEntity<?> alterVehicle(@PathVariable Integer id , @RequestBody VehicleResponse vehicleResponse){
         //System.out.println("Greetings from: " + greetingsRequest.getPersonName() + " with text " + greetingsRequest.getGreeting());
-        System.out.println("Vehicle " + vehicleRequest.toString());
-        System.out.println("The id to add is : " + id);
-        return ResponseEntity.ok().build();
-    }
-
-//    @GetMapping("hello/{id}")
-//    public ResponseEntity<?> getGreeting(@PathVariable Integer id){
-//        GreetingsResponse greetingsResponse = new GreetingsResponse();
-//        greetingsResponse.setGreeting("Hello from API");
-//        greetingsResponse.setPersonName("SpringBoot");
-//        return ResponseEntity.ok(greetingsResponse);
-//    }
-
-    @GetMapping("vehicle/{id}")
-    public ResponseEntity<?> getGreeting(@PathVariable Integer id){
-        VehicleResponse vehicleResponse = new VehicleResponse();
-        vehicleResponse.setId(1);
-        vehicleResponse.setBrand("Toyota");
-        vehicleResponse.setModel("Auris");
-        vehicleResponse.setMilleage(100000);
-        vehicleResponse.setPrice(16000.99);
-        vehicleResponse.setYear(2016);
-
-        
-        vehicleResponse.setDescription("mu bonito");
-        vehicleResponse.setColour("White");
-        vehicleResponse.setFuelType("Gasolina");
-        vehicleResponse.setNumDoors(4);
-
-
-        vehicleResponseList.add(vehicleResponse);
-
-
-
+        System.out.println("Vehicle " + vehicleResponse.toString());
         try {
-            VehicleResponse response = (VehicleResponse) vehicleResponseList.stream().filter(g -> g.getId() == id).findFirst().get();
+            vehicleResponseList.removeIf(v -> Objects.equals(v.getId(), id));
+            vehicleResponseList.add(vehicleResponse);
+            VehicleResponse response = (VehicleResponse) vehicleResponseList.stream().filter(v -> v.getId() == id).findFirst().get();
+
             return ResponseEntity.ok(response);
         }catch (NumberFormatException e){
             return ResponseEntity.notFound().build();
         }
         catch (Exception e){
 
-            log.error("Failed to request greeting with id {}" , id);
+            log.error("Failed to request vehicle with id {}" , id);
+            return ResponseEntity.internalServerError().build();
+        }
+
+    }
+
+    @GetMapping("vehicle/")
+    public List<VehicleResponse> getAllVehicle(){
+
+
+            return vehicleResponseList;
+    }
+
+    @GetMapping("vehicle/{id}")
+    public ResponseEntity<?> getVehicle(@PathVariable Integer id){
+
+        try {
+            VehicleResponse response = (VehicleResponse) vehicleResponseList.stream().filter(v -> v.getId() == id).findFirst().get();
+            return ResponseEntity.ok(response);
+        }catch (NumberFormatException e){
+            return ResponseEntity.notFound().build();
+        }
+        catch (Exception e){
+
+            log.error("Failed to request vehicle with id {}" , id);
             return ResponseEntity.internalServerError().build();
         }
 
