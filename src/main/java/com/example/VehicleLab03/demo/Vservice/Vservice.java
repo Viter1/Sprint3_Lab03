@@ -1,12 +1,21 @@
 package com.example.VehicleLab03.demo.Vservice;
 
-import com.example.VehicleLab03.demo.Vrepository.Vrepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import com.example.VehicleLab03.demo.Vcontroller.dtos.VehicleRequest;
+import com.example.VehicleLab03.demo.Vcontroller.dtos.VehicleResponse;
 
-@Service
-public class Vservice {
+import java.util.List;
 
-    @Autowired
-    private Vrepository vrepository;
+public interface Vservice {
+
+     VehicleResponse getVehicleById(Integer id) throws  Exception;
+
+     void deleteById(Integer id) throws Exception;
+
+
+     VehicleResponse updateById(Integer id , VehicleRequest vehicleRequest) throws Exception;
+
+     VehicleResponse saveVehicle(VehicleRequest vehicleRequest) throws Exception;
+
+      List<VehicleResponse> completeVehicleList();
+
 }

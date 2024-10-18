@@ -9,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @RestController
@@ -20,14 +18,54 @@ public class Vcontroller {
     @Autowired
     private Vservice vservice;
 
-    List<VehicleResponse> vehicleResponseList = new ArrayList<>();
+
+    @GetMapping("vehicle/{id}")
+    public ResponseEntity<?> getVehicleById(@PathVariable Integer id){
+
+        try {
+            //VehicleResponse response = (VehicleResponse) vehicleResponseList.stream().filter(v -> v.getId() == id).findFirst().get();
+            return ResponseEntity.ok(vservice.getVehicleById(id));
+        }catch (NumberFormatException e){
+            return ResponseEntity.notFound().build();
+        }
+        catch (Exception e){
+
+            log.error("Failed to request vehicle with id {}" , id);
+            return ResponseEntity.internalServerError().build();
+        }
+
+    }
+
+    @DeleteMapping("/vehicle/{id}")
+    public ResponseEntity<?> deleteVehicleById(@PathVariable Integer id){
+        System.out.println("The id to delete is : " + id);
+        try {
+            //VehicleResponse response = (VehicleResponse) vehicleResponseList.stream().filter(v -> v.getId() == id).findFirst().get();
+            vservice.deleteById(id);
+            return ResponseEntity.ok().build();
+        }catch (NumberFormatException e){
+            return ResponseEntity.notFound().build();
+        }
+        catch (Exception e){
+
+            log.error("Failed to request vehicle with id {}" , id);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 
     @PostMapping("/vehicle")
-    public ResponseEntity<?> addVehicle(@RequestBody VehicleResponse vehicleResponse){
+    public ResponseEntity<?> addVehicle(@RequestBody VehicleRequest vehicleRequest){
         //System.out.println("Grettings from: " + greetingsRequest.getPersonName() + " with text " + greetingsRequest.getGreeting());
-        System.out.println(vehicleResponse.toString());
-        vehicleResponseList.add(vehicleResponse);
-        return ResponseEntity.ok().build();
+        System.out.println(vehicleRequest.toString());
+        try {
+            //VehicleResponse response = (VehicleResponse) vehicleResponseList.stream().filter(v -> v.getId() == id).findFirst().get();
+            vservice.saveVehicle(vehicleRequest);
+            return ResponseEntity.ok().build();
+        }catch (NumberFormatException e){
+            return ResponseEntity.notFound().build();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
     }
 
 //    @DeleteMapping("/vehicle/{id}")
@@ -36,23 +74,17 @@ public class Vcontroller {
 //        return ResponseEntity.ok().build();
 //    }
 
-    @DeleteMapping("/vehicle/{id}")
-    public ResponseEntity<?>  deleteVehicle(@PathVariable Integer id){
-        vehicleResponseList.removeIf(v -> Objects.equals(v.getId(), id));
-        System.out.println("The id to delete is : " + id);
-        return ResponseEntity.ok().build();
-    }
+
 
     @PutMapping ("/vehicle/{id}")
-    public ResponseEntity<?> alterVehicle(@PathVariable Integer id , @RequestBody VehicleResponse vehicleResponse){
+    public ResponseEntity<?> alterVehicleById(@PathVariable Integer id , @RequestBody VehicleRequest vehicleRequest){
         //System.out.println("Greetings from: " + greetingsRequest.getPersonName() + " with text " + greetingsRequest.getGreeting());
-        System.out.println("Vehicle " + vehicleResponse.toString());
-        try {
-            vehicleResponseList.removeIf(v -> Objects.equals(v.getId(), id));
-            vehicleResponseList.add(vehicleResponse);
-            VehicleResponse response = (VehicleResponse) vehicleResponseList.stream().filter(v -> v.getId() == id).findFirst().get();
+        System.out.println("Vehicle " + vehicleRequest.toString());
 
-            return ResponseEntity.ok(response);
+        try {
+            //VehicleResponse response = (VehicleResponse) vehicleResponseList.stream().filter(v -> v.getId() == id).findFirst().get();
+            vservice.updateById(id,vehicleRequest);
+            return ResponseEntity.ok().build();
         }catch (NumberFormatException e){
             return ResponseEntity.notFound().build();
         }
@@ -66,26 +98,9 @@ public class Vcontroller {
 
     @GetMapping("vehicle/")
     public List<VehicleResponse> getAllVehicle(){
-
-
-            return vehicleResponseList;
+            return vservice.completeVehicleList();
     }
 
-    @GetMapping("vehicle/{id}")
-    public ResponseEntity<?> getVehicle(@PathVariable Integer id){
 
-        try {
-            VehicleResponse response = (VehicleResponse) vehicleResponseList.stream().filter(v -> v.getId() == id).findFirst().get();
-            return ResponseEntity.ok(response);
-        }catch (NumberFormatException e){
-            return ResponseEntity.notFound().build();
-        }
-        catch (Exception e){
-
-            log.error("Failed to request vehicle with id {}" , id);
-            return ResponseEntity.internalServerError().build();
-        }
-
-    }
 
 }

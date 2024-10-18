@@ -100,7 +100,7 @@
 							</inputSpec>
 							<generatorName>spring</generatorName>
 							<apiPackage>com.baeldung.openapi.api</apiPackage>
-							<modelPackage>com.Vitter.demo.controller.dtos</modelPackage>
+							<modelPackage>com.Vitter.demo.Vcontroller.dtos</modelPackage>
 							<supportingFilesToGenerate>
 								ApiUtil.java
 							</supportingFilesToGenerate>
